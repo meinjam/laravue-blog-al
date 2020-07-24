@@ -7,6 +7,14 @@
 
     <title>Laravel</title>
 
+    <script>
+        (function () {
+            window.laravel = {
+                csrfToken: '{{ csrf_token() }}'
+            };
+        })();
+    </script>
+
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 

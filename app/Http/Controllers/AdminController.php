@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
 use App\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller {
 
@@ -37,20 +39,50 @@ class AdminController extends Controller {
         return Tag::where( 'id', $request->id )->delete();
     }
 
-    public function index() {
-        //
+    public function getcategories() {
+        return Category::latest()->get();
     }
 
-    public function create() {
-        //
+    public function upload( Request $request ) {
+        $this->validate( $request, [
+            'file' => 'required|mimes:jpg,jpeg,png',
+        ] );
+
+        $imgName = time() . Str::random( 15 );
+        $imgExtension = strtolower( $request->file->getClientOriginalExtension() );
+        $imgFullName = "img/category/$imgName.$imgExtension";
+        $request->file->move( 'img/category/', "$imgName.$imgExtension" );
+        return $imgFullName;
     }
 
-    public function store( Request $request ) {
-        //
+    public function delete_upload( Request $request ) {
+        $image = $request->iconImage;
+        if ( file_exists( $image ) ) {
+            unlink( $image );
+        }
     }
 
-    public function show( $id ) {
-        //
+    public function addcategory( Request $request ) {
+        $this->validate( $request, [
+            'categoryName' => 'required',
+            'iconImage'    => 'required',
+        ] );
+        return Category::create( [
+            'categoryName' => $request->categoryName,
+            'iconImage'    => $request->iconImage,
+        ] );
+    }
+
+    public function deletecategory( Request $request ) {
+        $this->validate( $request, [
+            'id' => 'required',
+        ] );
+
+        $image = Category::where( 'id', $request->id )->first();
+        $delete = Category::where( 'id', $request->id )->delete();
+        if ( $delete ) {
+            unlink( $image->iconImage );
+        }
     }
 
     public function edit( $id ) {

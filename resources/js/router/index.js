@@ -2,11 +2,11 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Tags from "../views/Tags.vue";
+import Category from "../views/Category.vue";
 
 Vue.use(VueRouter);
 
-const routes = [
-    {
+const routes = [{
         path: "/",
         name: "Home",
         component: Home
@@ -15,6 +15,11 @@ const routes = [
         path: "/tags",
         name: "Tags",
         component: Tags
+    },
+    {
+        path: "/categories",
+        name: "Category",
+        component: Category
     }
 ];
 
