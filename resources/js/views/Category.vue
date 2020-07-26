@@ -53,6 +53,7 @@
           <Input v-model="data.categoryName" placeholder="Enter Category Name" />
           <div class="space"></div>
           <Upload
+            v-show="this.data.iconImage==''"
             type="drag"
             ref="uploads"
             :headers="{'x-csrf-token' : token, 'X-Requested-With' : 'XMLHttpRequest'}"
@@ -95,9 +96,9 @@
           <Upload
             v-show="this.editData.iconImage==''"
             type="drag"
-            ref="uploads"
+            ref="uploadsUpdate"
             :headers="{'x-csrf-token' : token, 'X-Requested-With' : 'XMLHttpRequest'}"
-            :on-success="handleSuccess"
+            :on-success="handleSuccessUp"
             :on-error="handleError"
             :format="['jpg','jpeg','png']"
             :max-size="2048"
@@ -119,13 +120,13 @@
           </div>
 
           <div slot="footer">
-            <Button type="default" @click="addModal=false">Close</Button>
+            <Button type="default" @click="editModal=false">Close</Button>
             <Button
               type="primary"
-              @click="addCategory"
+              @click="editCategory"
               :disabled="isAdding"
               :loading="isAdding"
-            >{{ isAdding ? 'Adding..' : 'Add Catrgory' }}</Button>
+            >{{ isAdding ? 'Updating..' : 'Update Catrgory' }}</Button>
           </div>
         </Modal>
 
@@ -204,25 +205,24 @@ export default {
           this.isAdding = false;
         });
     },
-    async editTag() {
-      if (this.editData.tagName.trim() == "")
-        return this.e("Tag name is required.");
-      if (this.editData.tagName.trim() == this.tags[this.index].tagName)
-        return this.e("Please enter a new tagname.");
-      const res = await this.callApi("post", "app/edit_tag", this.editData);
-      if (res.status === 200) {
-        this.tags[this.index].tagName = this.editData.tagName;
-        this.s("Tag has been updated successfully.");
-        this.editModal = false;
-      } else {
-        if (res.status === 422) {
-          if (res.data.errors.tagName) {
-            this.e(res.data.errors.tagName[0]);
-          }
-        } else {
+    editCategory() {
+      if (this.editData.categoryName.trim() == "")
+        return this.e("Category name is required.");
+      if (this.editData.iconImage.trim() == "")
+        return this.e("Icon image is required.");
+      this.isAdding = true;
+      axios
+        .post("app/edit_category", this.editData)
+        .then((resp) => {
+          this.categories[this.index].categoryName = this.editData.categoryName;
+          this.categories[this.index].iconImage = this.editData.iconImage;
+          this.s("Category has been updated successfully.");
+          this.editModal = false;
+          this.isAdding = false;
+        })
+        .catch((e) => {
           this.swr();
-        }
-      }
+        });
     },
     showEditModal(category, i) {
       let object = {
@@ -251,7 +251,7 @@ export default {
           })
           .catch((e) => {
             this.swr();
-            this.isAdding = false;
+            this.deleteModal = false;
           });
     },
     deleteImage() {
@@ -272,14 +272,35 @@ export default {
         .post("app/delete_image", { iconImage: this.editData.iconImage })
         .then((resp) => {
           this.editData.iconImage = "";
-          // this.$refs.uploads.clearFiles();
+          this.$refs.uploadsUpdate.clearFiles();
         })
         .catch((e) => {
           this.swr();
         });
+
+      // this.categories.forEach((data) => {
+      //   if (data.iconImage === this.editData.iconImage) {
+      //     console.log(data.iconImage);
+      //     // this.editData.iconImage = "";
+      //   } else {
+      //     console.log(data.iconImage);
+      //     axios
+      //       .post("app/delete_image", { iconImage: this.editData.iconImage })
+      //       .then((resp) => {
+      //         this.editData.iconImage = "";
+      //         this.$refs.uploadsUpdate.clearFiles();
+      //       })
+      //       .catch((e) => {
+      //         this.swr();
+      //       });
+      //   }
+      // });
     },
     handleSuccess(res, file) {
       this.data.iconImage = res;
+    },
+    handleSuccessUp(res, file) {
+      this.editData.iconImage = res;
     },
     handleError(res, file) {
       this.$Notice.error({

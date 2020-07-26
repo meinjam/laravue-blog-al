@@ -2154,6 +2154,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2202,60 +2203,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         _this.isAdding = false;
       });
     },
-    editTag: function editTag() {
+    editCategory: function editCategory() {
       var _this2 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var res;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                if (!(_this2.editData.tagName.trim() == "")) {
-                  _context.next = 2;
-                  break;
-                }
+      if (this.editData.categoryName.trim() == "") return this.e("Category name is required.");
+      if (this.editData.iconImage.trim() == "") return this.e("Icon image is required.");
+      this.isAdding = true;
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("app/edit_category", this.editData).then(function (resp) {
+        _this2.categories[_this2.index].categoryName = _this2.editData.categoryName;
+        _this2.categories[_this2.index].iconImage = _this2.editData.iconImage;
 
-                return _context.abrupt("return", _this2.e("Tag name is required."));
+        _this2.s("Category has been updated successfully.");
 
-              case 2:
-                if (!(_this2.editData.tagName.trim() == _this2.tags[_this2.index].tagName)) {
-                  _context.next = 4;
-                  break;
-                }
-
-                return _context.abrupt("return", _this2.e("Please enter a new tagname."));
-
-              case 4:
-                _context.next = 6;
-                return _this2.callApi("post", "app/edit_tag", _this2.editData);
-
-              case 6:
-                res = _context.sent;
-
-                if (res.status === 200) {
-                  _this2.tags[_this2.index].tagName = _this2.editData.tagName;
-
-                  _this2.s("Tag has been updated successfully.");
-
-                  _this2.editModal = false;
-                } else {
-                  if (res.status === 422) {
-                    if (res.data.errors.tagName) {
-                      _this2.e(res.data.errors.tagName[0]);
-                    }
-                  } else {
-                    _this2.swr();
-                  }
-                }
-
-              case 8:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }))();
+        _this2.editModal = false;
+        _this2.isAdding = false;
+      })["catch"](function (e) {
+        _this2.swr();
+      });
     },
     showEditModal: function showEditModal(category, i) {
       var object = {
@@ -2285,7 +2249,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       })["catch"](function (e) {
         _this3.swr();
 
-        _this3.isAdding = false;
+        _this3.deleteModal = false;
       });
     },
     deleteImage: function deleteImage() {
@@ -2309,13 +2273,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("app/delete_image", {
         iconImage: this.editData.iconImage
       }).then(function (resp) {
-        _this5.editData.iconImage = ""; // this.$refs.uploads.clearFiles();
+        _this5.editData.iconImage = "";
+
+        _this5.$refs.uploadsUpdate.clearFiles();
       })["catch"](function (e) {
         _this5.swr();
-      });
+      }); // this.categories.forEach((data) => {
+      //   if (data.iconImage === this.editData.iconImage) {
+      //     console.log(data.iconImage);
+      //     // this.editData.iconImage = "";
+      //   } else {
+      //     console.log(data.iconImage);
+      //     axios
+      //       .post("app/delete_image", { iconImage: this.editData.iconImage })
+      //       .then((resp) => {
+      //         this.editData.iconImage = "";
+      //         this.$refs.uploadsUpdate.clearFiles();
+      //       })
+      //       .catch((e) => {
+      //         this.swr();
+      //       });
+      //   }
+      // });
     },
     handleSuccess: function handleSuccess(res, file) {
       this.data.iconImage = res;
+    },
+    handleSuccessUp: function handleSuccessUp(res, file) {
+      this.editData.iconImage = res;
     },
     handleError: function handleError(res, file) {
       this.$Notice.error({
@@ -2339,18 +2324,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   created: function created() {
     var _this6 = this;
 
-    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
       var res;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
               _this6.token = window.laravel.csrfToken;
-              _context2.next = 3;
+              _context.next = 3;
               return _this6.callApi("get", "app/get_categories");
 
             case 3:
-              res = _context2.sent;
+              res = _context.sent;
 
               if (res.status == 200) {
                 _this6.categories = res.data;
@@ -2358,10 +2343,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 5:
             case "end":
-              return _context2.stop();
+              return _context.stop();
           }
         }
-      }, _callee2);
+      }, _callee);
     }))();
   }
 });
@@ -85628,6 +85613,14 @@ var render = function() {
               _c(
                 "Upload",
                 {
+                  directives: [
+                    {
+                      name: "show",
+                      rawName: "v-show",
+                      value: this.data.iconImage == "",
+                      expression: "this.data.iconImage==''"
+                    }
+                  ],
                   ref: "uploads",
                   attrs: {
                     type: "drag",
@@ -85752,14 +85745,14 @@ var render = function() {
                       expression: "this.editData.iconImage==''"
                     }
                   ],
-                  ref: "uploads",
+                  ref: "uploadsUpdate",
                   attrs: {
                     type: "drag",
                     headers: {
                       "x-csrf-token": _vm.token,
                       "X-Requested-With": "XMLHttpRequest"
                     },
-                    "on-success": _vm.handleSuccess,
+                    "on-success": _vm.handleSuccessUp,
                     "on-error": _vm.handleError,
                     format: ["jpg", "jpeg", "png"],
                     "max-size": 2048,
@@ -85813,7 +85806,7 @@ var render = function() {
                       attrs: { type: "default" },
                       on: {
                         click: function($event) {
-                          _vm.addModal = false
+                          _vm.editModal = false
                         }
                       }
                     },
@@ -85828,9 +85821,13 @@ var render = function() {
                         disabled: _vm.isAdding,
                         loading: _vm.isAdding
                       },
-                      on: { click: _vm.addCategory }
+                      on: { click: _vm.editCategory }
                     },
-                    [_vm._v(_vm._s(_vm.isAdding ? "Adding.." : "Add Catrgory"))]
+                    [
+                      _vm._v(
+                        _vm._s(_vm.isAdding ? "Updating.." : "Update Catrgory")
+                      )
+                    ]
                   )
                 ],
                 1

@@ -85,8 +85,16 @@ class AdminController extends Controller {
         }
     }
 
-    public function edit( $id ) {
-        //
+    public function editcategory( Request $request ) {
+        $this->validate( $request, [
+            'categoryName' => 'required',
+            'iconImage'    => 'required',
+            'id'           => 'required',
+        ] );
+        return Category::where( 'id', $request->id )->update( [
+            'categoryName' => $request->categoryName,
+            'iconImage'    => $request->iconImage,
+        ] );
     }
 
     public function update( Request $request, $id ) {

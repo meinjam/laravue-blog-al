@@ -12,6 +12,7 @@ Route::post( 'app/upload', 'AdminController@upload' );
 Route::post( 'app/delete_image', 'AdminController@delete_upload' );
 Route::post( 'app/create_category', 'AdminController@addcategory' );
 Route::post( 'app/delete_category', 'AdminController@deletecategory' );
+Route::post( 'app/edit_category', 'AdminController@editcategory' );
 
 Route::get( '/', function () {
     return view( 'welcome' );
